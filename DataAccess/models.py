@@ -11,4 +11,9 @@ class Todo(Base):
     priority = Column(Integer, nullable=False,index=True)
     created_at = Column(DateTime, nullable=False, index=True, default= lambda: datetime.now(timezone.utc))
     completed = Column(Boolean, index= True, default=False,nullable=False)
-    
+
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(Integer,autoincrement=True, primary_key=True,index=True)
+    username= Column(String, index= True, unique=True, nullable=False)
+    hashed_password= Column(String, index= True, nullable=False)
