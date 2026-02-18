@@ -1,18 +1,15 @@
 # Todo API v2
-
 A clean REST API for managing todos, built with FastAPI, SQLAlchemy, and Alembic migrations.
 
 ## Features
-
 - Full CRUD operations for todos
 - SQLAlchemy ORM with SQLite
 - Alembic database migrations
-- Pydantic validation
+- Pydantic validation with cross-field rules (completed todos cannot have priority changed)
 - Dependency injection
 - 9 comprehensive tests with test database isolation
 
 ## Tech Stack
-
 - FastAPI
 - SQLAlchemy
 - Alembic
@@ -36,26 +33,21 @@ A clean REST API for managing todos, built with FastAPI, SQLAlchemy, and Alembic
 ```
 
 ## Setup
-
 1. Install dependencies:
 ```bash
-   pip install -r requirements.txt
+pip install -r requirements.txt
 ```
-
 2. Apply migrations:
 ```bash
-   alembic upgrade head
+alembic upgrade head
 ```
-
 3. Run the server:
 ```bash
-   uvicorn main:app --reload
+uvicorn main:app --reload
 ```
-
 4. Open docs: `http://127.0.0.1:8000/docs`
 
 ## API Endpoints
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/todo/` | Create a todo |
@@ -64,11 +56,19 @@ A clean REST API for managing todos, built with FastAPI, SQLAlchemy, and Alembic
 | PUT | `/todo/{id}` | Update a todo |
 | DELETE | `/todo/{id}` | Delete a todo |
 
-## Tests
+## Example Request
+```json
+POST /todo/
+{
+  "title": "Buy groceries",
+  "description": "Milk, eggs, bread",
+  "priority": 2
+}
+```
 
+## Tests
 Run tests:
 ```bash
 pytest -v
 ```
-
 9/9 tests passing with 100% endpoint coverage.

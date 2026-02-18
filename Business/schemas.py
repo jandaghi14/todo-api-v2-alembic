@@ -1,7 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from datetime import datetime
 from typing import Optional
-
 
 class TodoBase(BaseModel):
     title : str
@@ -16,6 +15,13 @@ class TodoUpdate(BaseModel):
     description : Optional[str]=None
     priority : Optional[int]=None
     completed :  Optional[bool]=None
+    
+    @model_validator(mode='after')
+    def check_completed(self):
+        if self.completed is True and self.priority is not None:
+            raise ValueError("Cannot change priority of a completed todo")
+        return self
+            
     
 class TodoShow(TodoCreate):
     id : int
