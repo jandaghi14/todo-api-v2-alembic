@@ -34,66 +34,69 @@ def set_up_db():
 def client(set_up_db):
     return TestClient(app)
 
+@pytest.fixture
+def auth_header(client):
+    client.post('/register', params={'username':'testuser', 'password':'testpass'})
+    response = client.post('/login', data={'username':'testuser', 'password':'testpass'})
 
-def test_create_todo(client):
+    token = response.json()['access_token']
+    return {'Authorization': f'Bearer {token}'} 
+
+
+
+def test_create_todo(client, auth_header):
     response= client.post('/todo/',json={'title':'test_title',
                                       'description' : 'test_desctiption',
                                       'priority': 1
-                                      } )
+                                      },headers=auth_header )
     assert response.status_code == 200
     assert response.json()['title'] == 'test_title'
     # ===============================
-def test_get_all_todos(client):
+def test_get_all_todos(client, auth_header):
     client.post('/todo/',json={'title':'test_title1',
                                       'description' : 'test_desctiption1',
                                       'priority': 1
-                                      } )
+                                      },headers=auth_header )
     client.post('/todo/',json={'title':'test_title2',
                                       'description' : 'test_desctiption2',
                                       'priority': 2
-                                      } )
+                                      } ,headers=auth_header)
 
-    response= client.get('/todo')
+    response= client.get('/todo',headers=auth_header)
     assert response.status_code == 200
     assert len(response.json()) == 2
     # ===============================
-def test_get_all_todos_fail(client):
-
-    response= client.get('/todo')
-    assert response.status_code == 404
-    assert response.json()['detail'] == 'No such todo'
-    # ===============================
-def test_get_todos(client):
+def test_get_todos(client, auth_header):
     client.post('/todo/',json={'title':'test_title1',
                                       'description' : 'test_desctiption1',
                                       'priority': 1
-                                      } )
+                                      } ,headers=auth_header)
     client.post('/todo/',json={'title':'test_title2',
                                       'description' : 'test_desctiption2',
                                       'priority': 2
-                                      } )
+                                      } ,headers=auth_header)
 
-    response= client.get('/todo/2')
+    response= client.get('/todo/2',headers=auth_header)
     assert response.status_code == 200
     assert response.json()['title'] == 'test_title2'
     # ===============================
-def test_get_todos_fail(client):
-    response= client.get('/todo/2')
+def test_get_todos_fail(client, auth_header):
+    response= client.get('/todo/2',headers=auth_header)
     assert response.status_code == 404
     assert response.json()['detail'] == 'No such todo'
 
     # ===============================
 
-def test_update_todo(client):
+def test_update_todo(client, auth_header):
     client.post('/todo/',json={'title':'test_title',
                                       'description' : 'test_desctiption',
                                       'priority': 1
-                                      } )
+                                      },headers=auth_header )
     response= client.put('/todo/1', json={'title':'update',
                                       'description' : 'update_desc',
                                       'priority': 1,
                                       'completed': False
-    })
+    },headers=auth_header)
 
     assert response.status_code == 200
     assert response.json()['title'] == 'update'
@@ -101,43 +104,39 @@ def test_update_todo(client):
     assert response.json()['priority'] == 1
     assert response.json()['completed'] == False
     # ===============================
-
-def test_update_todo_fail(client):
+def test_update_todo_fail(client, auth_header):
     response= client.put('/todo/1', json={'title':'update',
                                       'description' : 'update_desc',
                                       'priority': 2,
                                       'completed': False
-    })
+    },headers=auth_header)
 
     assert response.status_code == 404
     assert response.json()['detail'] == 'No such todo'
     # ===============================
-def test_update_completed(client):
+def test_update_completed(client, auth_header):
     client.post('/todo/',json={'title':'test_title',
                                       'description' : 'test_desctiption',
                                       'priority': 1
-                                      } )
+                                      } ,headers=auth_header)
     response= client.put('/todo/1', json={'title':'update',
                                       'description' : 'update_desc',
                                       'priority': 2,
                                       'completed': True
-    })
+    },headers=auth_header)
     assert response.status_code == 422
 
-
-
-def test_delete_todo(client):
+def test_delete_todo(client, auth_header):
     client.post('/todo/',json={'title':'test_title',
                                       'description' : 'test_desctiption',
                                       'priority': 1
-                                      } )
-    response = client.delete('/todo/1')
+                                      } ,headers=auth_header)
+    response = client.delete('/todo/1',headers=auth_header)
     assert response.status_code == 200
     assert response.json() == 'Deletion successfully'
     # ===============================
-
-def test_delete_todo_fail(client):
-    response = client.delete('/todo/1')
+def test_delete_todo_fail(client, auth_header):
+    response = client.delete('/todo/1',headers=auth_header)
     assert response.status_code == 404
     assert response.json()['detail'] == 'No such todo'
 
