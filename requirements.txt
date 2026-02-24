@@ -3,5 +3,9 @@ uvicorn
 sqlalchemy
 alembic
 pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+python-dotenv
 pytest
 httpx

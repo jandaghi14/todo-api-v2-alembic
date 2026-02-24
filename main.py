@@ -7,10 +7,46 @@ from DataAccess import models
 from Business.auth_routes import router as auth_router
 from Business.auth import get_current_user
 
+from fastapi.middleware.cors import CORSMiddleware
+from time import time
+
+# Frontend origins that can access your backend
+origins = [
+    "http://localhost:3000",   # React development server
+    "http://127.0.0.1:3000",   # sometimes used interchangeably
+]
+
 
 app = FastAPI()
-app.include_router(auth_router)
 # Base.metadata.create_all(bind=engine)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=['*'],
+    allow_headers=['*'],
+    allow_credentials=True)
+
+app.include_router(auth_router)
+
+@app.middleware("http") # this tells FastAPI: run this function for every HTTP request before it reaches any endpoint.
+async def log_requests(request, call_next):
+    # request — the incoming request object (method, path, headers, etc.)
+    # call_next — a function that forwards the request to the actual endpoint
+    # --- BEFORE endpoint ---
+    start = time()
+    print(f"Incoming: {request.method} {request.url.path}")
+    # --- endpoint runs here ---
+    response = await call_next(request) #This says: "pass the request to the actual endpoint now, wait for it to finish, and give me back the response."
+    # --- AFTER endpoint ---
+    duration = time() - start
+    print(f"Completed: {response.status_code} in {duration:.3f}s")
+    
+    return response
+
+
+
+
 
 @app.post('/todo/',response_model= TodoShow)
 def endpoint_create_todo(todo:TodoCreate,current_user:str=Depends(get_current_user),db:Session=Depends(get_db)):
