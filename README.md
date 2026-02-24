@@ -1,5 +1,8 @@
-# Todo API v2
+# Todo API v3
 A clean REST API for managing todos with JWT authentication, built with FastAPI, SQLAlchemy, and Alembic migrations.
+
+**🌐 Live API:** https://todo-api-v2-alembic-production.up.railway.app/docs
+
 
 ## Features
 - Full CRUD operations for todos
@@ -9,6 +12,7 @@ A clean REST API for managing todos with JWT authentication, built with FastAPI,
 - Alembic database migrations
 - Pydantic validation with cross-field rules (completed todos cannot have priority changed)
 - Dependency injection
+- CORS and Middleware
 - 9 comprehensive tests with test database isolation
 
 ## Tech Stack
